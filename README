@@ -2,12 +2,7 @@ This is a Python client for the Syra SOAP API. It attempts to make
 working with the API feel pythonic, returning lists and dictionaries
 in place of the native SOAP responses.
 
-Dependencies
-============
+Note that there is no validation at present, this is a very simple
+implementation that assumes you can perform the API calls you attempt.
 
-SUDS
-----
-
-https://fedorahosted.org/suds/
-
- * svn export http://svn.fedorahosted.org/svn/suds/trunk/suds
+A future version will probably provide better handling of failures.
