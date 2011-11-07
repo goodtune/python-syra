@@ -15,6 +15,9 @@ class API(object):
     WSDL = 'http://soap.secureapi.com.au/wsdl/API-1.0.wsdl'
 
     def __init__(self, reseller_id, api_key, *args, **kwargs):
+        self.reseller_id = reseller_id
+        self.api_key = api_key
+
         imp = Import('http://schemas.xmlsoap.org/soap/encoding/')
         imp.filter.add(self.ENDPOINT)
         doctor = ImportDoctor(imp)
