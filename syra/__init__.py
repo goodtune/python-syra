@@ -103,7 +103,10 @@ class API(object):
             elif k == "Eligibility":
                 d[k] = dict(zip(v.__keylist__, itemgetter(*v.__keylist__)(v)))
             elif k == "Expiry":
-                d[k] = parse(v).date()
+                try:
+                    d[k] = parse(v).date()
+                except (AttributeError, TypeError):
+                    d[k] = v
             else:
                 d[k] = v
         return d
