@@ -109,7 +109,11 @@ class API(object):
         return d
 
     def _domain_list_item(self, o):
-        return (o.DomainName, o.Status, parse(o.Expiry).date())
+        try:
+            expiry_date = parse(o.Expiry).date()
+        except AttributeError:
+            expiry_date = o.Expiry
+        return (o.DomainName, o.Status, expiry_date)
 
 
 class TestAPI(API):
