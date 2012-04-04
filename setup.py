@@ -9,6 +9,6 @@ setup(
     author = 'Gary Reynolds',
     author_email = 'gary@touch.asn.au',
     description = 'Client for the Syra API.',
-    install_requires = ['suds', 'python-dateutil'],
+    install_requires = ['suds', 'python-dateutil<2.0'],
     packages = ['syra'],
 )
