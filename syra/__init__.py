@@ -11,8 +11,8 @@ from suds.xsd.doctor import ImportDoctor, Import
 
 class API(object):
 
-    ENDPOINT = 'http://soap.secureapi.com.au/API-1.0'
-    WSDL = 'http://soap.secureapi.com.au/wsdl/API-1.0.wsdl'
+    ENDPOINT = 'http://soap.secureapi.com.au/API-1.1'
+    WSDL = 'http://soap.secureapi.com.au/wsdl/API-1.1.wsdl'
 
     def __init__(self, reseller_id, api_key, *args, **kwargs):
         self.reseller_id = reseller_id
@@ -53,9 +53,22 @@ class API(object):
             result = Decimal(re.search(r'\d+\.\d{2}', result).group())
         return result
 
+    def contact_list(self):
+        request = self.client.service.GetContactIdentifierList()
+        for identifier in request.APIResponse.ContactIdentifierList:
+            yield self.contact_info(identifier)
+
     def domain_list(self):
         request = self.client.service.GetDomainList()
         return map(self._domain_list_item, request.APIResponse.DomainList)
+
+    ### contact operations
+
+    def contact_info(self, identifier):
+        request = self.client.factory.create('ContactInfoRequest')
+        request.ContactIdentifier = identifier
+        response = self.client.service.ContactInfo(request)
+        return self._contact_details(response)
 
     ### domain operations
     
@@ -93,7 +106,13 @@ class API(object):
     ### private methods
     
     def _availability_item(self, o):
-    	return (o.Item, o.Available)
+        return (o.Item, o.Available)
+
+    def _contact_details(self, response):
+        c = {}
+        for k, v in response.APIResponse.ContactDetails:
+            c[k] = v
+        return c
 
     def _domain_details(self, response):
         d = {}
@@ -121,8 +140,8 @@ class API(object):
 
 class TestAPI(API):
 
-    ENDPOINT = 'http://soap-test.secureapi.com.au/API-1.0'
-    WSDL = 'http://soap-test.secureapi.com.au/wsdl/API-1.0.wsdl'
+    ENDPOINT = 'http://soap-test.secureapi.com.au/API-1.1'
+    WSDL = 'http://soap-test.secureapi.com.au/wsdl/API-1.1.wsdl'
 
     def spawn_domains_for_transfer(self):
         # it seems as though this method is not working properly at the server side
