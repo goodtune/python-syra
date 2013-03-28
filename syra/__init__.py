@@ -28,8 +28,8 @@ class API(object):
             Element('AuthenticateRequest').append([
                 Element('ResellerID').setText(reseller_id),
                 Element('APIKey').setText(api_key),
-                ])
-            )
+            ])
+        )
 
         # interogate the WSDL and treat it with our doctor
         self.client = Client(self.WSDL, doctor=doctor)
@@ -38,14 +38,14 @@ class API(object):
         self.client.set_options(soapheaders=token)
 
     ### generic api operations
-    
+
     def authenticate(self, reseller_id=None, api_key=None):
         request = self.client.factory.create('AuthenticateRequest')
         request.ResellerID = reseller_id or self.reseller_id
         request.APIKey = api_key or self.api_key
         response = self.client.service.Authenticate(request)
         return response.APIResponse.Success
-        
+
     def balance(self, as_decimal=True):
         response = self.client.service.GetBalance()
         result = response.APIResponse.Balance
@@ -71,12 +71,13 @@ class API(object):
         return self._contact_details(response)
 
     ### domain operations
-    
+
     def domain_check(self, *domains):
         request = self.client.factory.create('DomainCheckRequest')
         request.DomainNames.string = domains
         response = self.client.service.DomainCheck(request)
-        return map(self._availability_item, response.APIResponse.AvailabilityList)
+        return map(self._availability_item,
+                   response.APIResponse.AvailabilityList)
 
     def _domain_info(self, domain):
         request = self.client.factory.create('DomainInfoRequest')
@@ -85,10 +86,10 @@ class API(object):
 
     def domain_info(self, domain):
         return self._domain_details(self._domain_info(domain))
-    
+
     def domain_create(self, domain, **kwargs):
         raise NotImplementedError
-    
+
     def domain_update(self, domain, admin_contact_id=None,
                       billing_contact_id=None, technical_contact_id=None):
         info = self._domain_info(domain).APIResponse.DomainDetails
@@ -107,22 +108,22 @@ class API(object):
         request.NameServers = info.NameServers
         response = self.client.service.DomainUpdate(request)
         return self._domain_details(response)
-    
+
     def domain_delete(self, domain):
         request = self.client.factory.create('DomainDeleteRequest')
         request.DomainName = domain
         response = self.client.service.DomainDelete(request)
         return response.APIResponse.Success
-    
+
     def domain_renew(self, domain, period):
         request = self.client.factory.create('DomainRenewRequest')
         request.DomainName = domain
         request.RenewalPeriod = period
         response = self.client.service.DomainRenew(request)
         return self._domain_details(response)
-    
+
     ### private methods
-    
+
     def _availability_item(self, o):
         return (o.Item, o.Available)
 
@@ -162,6 +163,7 @@ class TestAPI(API):
     WSDL = 'http://soap-test.secureapi.com.au/wsdl/API-1.1.wsdl'
 
     def spawn_domains_for_transfer(self):
-        # it seems as though this method is not working properly at the server side
+        # It seems as though this method is not working properly
+        # at the server side?
         response = self.client.service.SpawnDomainsForTransfer()
         return response
