@@ -78,11 +78,13 @@ class API(object):
         response = self.client.service.DomainCheck(request)
         return map(self._availability_item, response.APIResponse.AvailabilityList)
 
-    def domain_info(self, domain):
+    def _domain_info(self, domain):
         request = self.client.factory.create('DomainInfoRequest')
         request.DomainName = domain
-        response = self.client.service.DomainInfo(request)
-        return self._domain_details(response)
+        return self.client.service.DomainInfo(request)
+
+    def domain_info(self, domain):
+        return self._domain_details(self._domain_info(domain))
     
     def domain_create(self, domain, **kwargs):
         raise NotImplementedError
