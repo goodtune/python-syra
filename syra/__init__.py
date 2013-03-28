@@ -89,8 +89,24 @@ class API(object):
     def domain_create(self, domain, **kwargs):
         raise NotImplementedError
     
-    def domain_update(self, domain, **kwargs):
-        raise NotImplementedError
+    def domain_update(self, domain, admin_contact_id=None,
+                      billing_contact_id=None, technical_contact_id=None):
+        info = self._domain_info(domain).APIResponse.DomainDetails
+        request = self.client.factory.create('DomainUpdateRequest')
+        request.DomainName = domain
+        # Assign any provided values, keep existing ones as retrieved from
+        # DomainInfo request, and get readt to assign them.
+        request.AdminContactIdentifier = admin_contact_id or \
+            info.AdminContactIdentifier
+        request.BillingContactIdentifier = billing_contact_id or \
+            info.BillingContactIdentifier
+        request.TechContactIdentifier = technical_contact_id or \
+            info.TechContactIdentifier
+        # API is not allowed to update the DNS delegation in this version,
+        # simply use the values as retrieved from the DomainInfo request.
+        request.NameServers = info.NameServers
+        response = self.client.service.DomainUpdate(request)
+        return self._domain_details(response)
     
     def domain_delete(self, domain):
         request = self.client.factory.create('DomainDeleteRequest')
