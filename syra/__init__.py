@@ -11,8 +11,8 @@ from suds.xsd.doctor import ImportDoctor, Import
 
 class API(object):
 
-    ENDPOINT = 'http://soap.secureapi.com.au/API-1.1'
-    WSDL = 'http://soap.secureapi.com.au/wsdl/API-1.1.wsdl'
+    ENDPOINT = 'https://soap.secureapi.com.au/API-1.1'
+    WSDL = 'https://soap.secureapi.com.au/wsdl/API-1.1.wsdl'
 
     def __init__(self, reseller_id, api_key, *args, **kwargs):
         self.reseller_id = reseller_id
