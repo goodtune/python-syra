@@ -1,3 +1,5 @@
+import os
+
 from unittest import TestCase
 
 import syra
@@ -5,7 +7,8 @@ import syra
 class SimpleTest(TestCase):
 
     def setUp(self):
-        self.api = syra.TestAPI(TEST_RESELLER_ID, TEST_API_KEY)
+        self.api = syra.TestAPI(
+            os.environ['RESELLER_ID'], os.environ['API_KEY'])
 
     def test_basic_addition(self):
         """
