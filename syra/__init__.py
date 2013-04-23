@@ -55,8 +55,9 @@ class API(object):
 
     def contact_list(self):
         request = self.client.service.GetContactIdentifierList()
-        for identifier in request.APIResponse.ContactIdentifierList:
-            yield self.contact_info(identifier)
+        if hasattr(request.APIResponse, 'ContactIdentifierList'):
+            for identifier in request.APIResponse.ContactIdentifierList:
+                yield self.contact_info(identifier)
 
     def domain_list(self):
         request = self.client.service.GetDomainList()
