@@ -1,5 +1,6 @@
 import os
 
+from decimal import Decimal
 from unittest import TestCase
 
 import syra
@@ -20,3 +21,7 @@ class SimpleTest(TestCase):
     def test_balance_string(self):
         balance = self.api.balance(as_decimal=False)
         self.assertEqual(balance, '$5.72 AUD')
+
+    def test_balance_decimal(self):
+        balance = self.api.balance()
+        self.assertEqual(balance, Decimal('5.72'))
