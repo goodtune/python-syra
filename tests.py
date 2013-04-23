@@ -7,8 +7,9 @@ import syra
 class SimpleTest(TestCase):
 
     def setUp(self):
-        self.api = syra.TestAPI(
-            os.environ['RESELLER_ID'], os.environ['API_KEY'])
+        reseller_id = os.environ.get('RESELLER_ID')
+        api_key = os.environ.get('API_KEY')
+        self.api = syra.TestAPI(reseller_id, api_key)
 
     def test_basic_addition(self):
         """
