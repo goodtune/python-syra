@@ -1,9 +1,19 @@
 language: python
-python:
-  - "2.5"
-  - "2.6"
-  - "2.7"
-install:
-  - pip install .
-script:
-  - nosetests
+env: 
+  global: 
+  - secure: |-
+      ekXl+NIu2iRaxUzawt6A6KyqmwlpQP/Yvqo/ovwj9KEW9YSYVvtKf59FpMWw
+      ubAa+FKwlRPWPOm7FGo8uxL+MyFRF/w8ofKJRy7jCyRDe6k/ADD9xoz8bvzh
+      VAWG6HIa9RC2TjC9T9RnHC+wPa/TuT5aT8og4xXI/yl2BaMTzAc=
+  - secure: |-
+      h/l+mkM+zsBPOq4V+LYYNfUeFBOXSaLdm9F8fcdYqojBx3lEHHoCk60Fx7K8
+      VVKoap2J1J0uaYNtzQnM93ZXBopM7obZ6CZJSrlsRoly+tjOSl5Wery1MQGv
+      OdmkX+DbLwkv+B0sLs9uDJu+FBZKto04zU6WlJZ9/V/0C/I/SR4=
+script: 
+- nosetests
+python: 
+- "2.5"
+- "2.6"
+- "2.7"
+install: 
+- pip install .
