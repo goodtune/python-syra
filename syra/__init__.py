@@ -61,7 +61,8 @@ class API(object):
 
     def domain_list(self):
         request = self.client.service.GetDomainList()
-        return map(self._domain_list_item, request.APIResponse.DomainList)
+        domain_list = getattr(request.APIResponse, 'DomainList', [])
+        return map(self._domain_list_item, domain_list)
 
     ### contact operations
 
