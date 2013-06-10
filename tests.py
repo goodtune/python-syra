@@ -29,3 +29,10 @@ class SimpleTest(TestCase):
     def test_domain_list(self):
         domains = self.api.domain_list()
         self.assertEqual(domains, [])
+
+    def test_domain_price_list(self):
+        products = self.api.domain_price_list()
+        com_au = products.get('com.au')
+        co_uk = products.get('co.uk')
+        self.assertEqual(com_au, {'MinimumPeriod': 2, 'Price': 10.0})
+        self.assertEqual(co_uk, {'MinimumPeriod': 1, 'Price': 9.25})

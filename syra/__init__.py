@@ -4,6 +4,7 @@ from operator import itemgetter
 import re
 
 from dateutil.parser import parse
+from first import first
 from suds.client import Client
 from suds.sax.element import Element
 from suds.xsd.doctor import ImportDoctor, Import
@@ -131,6 +132,10 @@ class API(object):
         response = self.client.service.DomainRenew(request)
         return self._domain_details(response)
 
+    def domain_price_list(self):
+        response = self.client.service.GetDomainPriceList()
+        return self._domain_price_list(response)
+
     ### private methods
 
     def _availability_item(self, o):
@@ -164,6 +169,14 @@ class API(object):
         except (AttributeError, TypeError):
             expiry_date = o.Expiry
         return (o.DomainName, o.Status, expiry_date)
+
+    def _domain_price_list(self, response):
+        d = {}
+        for item in response.APIResponse.DomainPriceList:
+            data = dict((k, first(v)) for k, v in item)
+            product = data.pop('Product')
+            d[product] = data
+        return d
 
 
 class TestAPI(API):
