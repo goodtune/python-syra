@@ -1,7 +1,7 @@
 from distutils.core import setup
 from string import strip
 
-version = "0.2"
+version = "0.3"
 
 setup(
     name = 'python-syra',
