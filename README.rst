@@ -1,3 +1,6 @@
+.. image:: https://secure.travis-ci.org/goodtune/python-syra.png?branch=master
+   :target: http://travis-ci.org/#!/goodtune/python-syra
+
 This is a Python client for the Syra SOAP API. It attempts to make
 working with the API feel pythonic, returning lists and dictionaries
 in place of the native SOAP responses.
