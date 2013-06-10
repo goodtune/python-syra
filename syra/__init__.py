@@ -92,7 +92,8 @@ class API(object):
         raise NotImplementedError
 
     def domain_update(self, domain, admin_contact_id=None,
-                      billing_contact_id=None, technical_contact_id=None):
+                      billing_contact_id=None, technical_contact_id=None,
+                      name_servers=None):
         info = self._domain_info(domain).APIResponse.DomainDetails
         request = self.client.factory.create('DomainUpdateRequest')
         request.DomainName = domain
@@ -104,9 +105,15 @@ class API(object):
             info.BillingContactIdentifier
         request.TechContactIdentifier = technical_contact_id or \
             info.TechContactIdentifier
-        # API is not allowed to update the DNS delegation in this version,
-        # simply use the values as retrieved from the DomainInfo request.
-        request.NameServers = info.NameServers
+        if name_servers:
+            request.NameServers.item = []
+            for host, ip in name_servers.items():
+                ns = self.client.factory.create('NameServer')
+                ns.Host = host
+                ns.IP = ip
+                request.NameServers.item.append(ns)
+        else:
+            request.NameServers = info.NameServers
         response = self.client.service.DomainUpdate(request)
         return self._domain_details(response)
 
