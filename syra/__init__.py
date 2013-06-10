@@ -151,7 +151,7 @@ class API(object):
         d = {}
         for k, v in response.APIResponse.DomainDetails:
             if k == "NameServers":
-                d[k] = [(o.Host, o.IP) for o in v]
+                d[k] = [dict(Host=first(o.Host), IP=first(o.IP)) for o in v]
             elif k == "Eligibility":
                 d[k] = dict(zip(v.__keylist__, itemgetter(*v.__keylist__)(v)))
             elif k == "Expiry":
