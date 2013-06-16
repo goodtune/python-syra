@@ -165,10 +165,10 @@ class API(object):
 
     def _domain_list_item(self, o):
         try:
-            expiry_date = parse(o.Expiry).date()
+            expiry_date = parse(first(o.Expiry)).date()
         except (AttributeError, TypeError):
-            expiry_date = o.Expiry
-        return (o.DomainName, o.Status, expiry_date)
+            expiry_date = first(o.Expiry)
+        return (first(o.DomainName), first(o.Status), expiry_date)
 
     def _domain_price_list(self, response):
         d = {}

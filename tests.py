@@ -1,3 +1,4 @@
+import datetime
 import os
 
 from decimal import Decimal
@@ -36,3 +37,17 @@ class SimpleTest(TestCase):
         co_uk = products.get('co.uk')
         self.assertEqual(com_au, {'MinimumPeriod': 2, 'Price': 10.0})
         self.assertEqual(co_uk, {'MinimumPeriod': 1, 'Price': 9.25})
+
+class LiveTest(TestCase):
+
+    def setUp(self):
+        reseller_id = os.environ.get('RESELLER_ID')
+        api_key = os.environ.get('API_KEY')
+        self.api = syra.API(reseller_id, api_key)
+
+    def test_domain_list(self):
+        domains = self.api.domain_list()
+        for domain, status, expiry in domains:
+            self.assertEqual(isinstance(domain, basestring), True)
+            self.assertEqual(isinstance(status, basestring), True)
+            self.assertEqual(isinstance(expiry, datetime.date), True)
