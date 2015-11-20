@@ -1,0 +1,4 @@
+[report]
+fail_under = 45
+include=syra/*
+show_missing = true
