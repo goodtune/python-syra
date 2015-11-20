@@ -1,0 +1,5 @@
+[nosetests]
+with-coverage
+cover-erase
+cover-html
+verbosity=3
