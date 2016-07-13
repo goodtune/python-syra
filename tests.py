@@ -9,7 +9,7 @@ import syra
 class SimpleTest(TestCase):
 
     def setUp(self):
-        self.api = syra.TestAPI()
+        self.api = syra.TestAPI(timeout=3)
 
     def test_basic_addition(self):
         """

@@ -16,7 +16,7 @@ class API(object):
     ENDPOINT = 'https://soap.secureapi.com.au/API-1.1'
     WSDL = 'https://soap.secureapi.com.au/wsdl/API-1.1.wsdl'
 
-    def __init__(self, reseller_id=None, api_key=None, *args, **kwargs):
+    def __init__(self, reseller_id=None, api_key=None, timeout=90, *args, **kwargs):
         if reseller_id is None:
             reseller_id = os.environ.get('SYRA_RESELLER_ID')
         if api_key is None:
@@ -39,7 +39,7 @@ class API(object):
         )
 
         # interogate the WSDL and treat it with our doctor
-        self.client = Client(self.WSDL, doctor=doctor)
+        self.client = Client(self.WSDL, doctor=doctor, timeout=timeout)
 
         # attach our authentication XML
         self.client.set_options(soapheaders=token)
