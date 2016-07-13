@@ -1,6 +1,7 @@
 from decimal import Decimal
 from operator import itemgetter
 
+import os
 import re
 
 from dateutil.parser import parse
@@ -15,7 +16,12 @@ class API(object):
     ENDPOINT = 'https://soap.secureapi.com.au/API-1.1'
     WSDL = 'https://soap.secureapi.com.au/wsdl/API-1.1.wsdl'
 
-    def __init__(self, reseller_id, api_key, *args, **kwargs):
+    def __init__(self, reseller_id=None, api_key=None, *args, **kwargs):
+        if reseller_id is None:
+            reseller_id = os.environ.get('SYRA_RESELLER_ID')
+        if api_key is None:
+            api_key = os.environ.get('SYRA_API_KEY')
+
         self.reseller_id = reseller_id
         self.api_key = api_key
 
