@@ -11,6 +11,10 @@ class SimpleTest(TestCase):
     def setUp(self):
         self.api = syra.TestAPI(timeout=3)
 
+    def test_authenticate(self):
+        self.assertTrue(self.api.authenticate())
+        self.assertFalse(self.api.authenticate('Z1111'))
+
     def test_balance_string(self):
         balance = self.api.balance(as_decimal=False)
         self.assertEqual(balance, '$5.72 AUD')
