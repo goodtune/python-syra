@@ -19,6 +19,10 @@ class SimpleTest(TestCase):
         balance = self.api.balance()
         self.assertEqual(balance, Decimal('5.72'))
 
+    def test_contact_list(self):
+        contacts = self.api.contact_list()
+        self.assertItemsEqual(contacts, [])
+
     def test_domain_list(self):
         domains = self.api.domain_list()
         self.assertEqual(domains, [])
