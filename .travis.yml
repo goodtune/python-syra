@@ -9,6 +9,10 @@ env:
       edP4jb1H/w17C90SRwJWNv7wQwcwXJZcHMKqVSK9aWbuknb509YwAGdZtdsT
       aSlw1SgMW34HC0D3hOcTNn9AgICRKYlPy/utZl71B+PSe5uRDKyCO6Jg13ro
       t8VQNl/eUtQyuQ6b2CASzu5YhmLoWCOb70qevvyGGhIZ0Rbw9jw=
+  - NOSE_WITH_COVERAGE=1
+  - NOSE_COVER_PACKAGE=syra
+  - NOSE_COVER_BRANCHES=1
+  - NOSE_NOLOGCAPTURE=1
 script: 
 - nosetests
 python: 
