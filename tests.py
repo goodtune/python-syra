@@ -2,6 +2,7 @@ import datetime
 import os
 
 from decimal import Decimal
+from first import first
 from unittest import TestCase
 
 import syra
@@ -27,6 +28,16 @@ class SimpleTest(TestCase):
         contacts = self.api.contact_list()
         self.assertItemsEqual(contacts, [])
 
+    def test_domain_check(self):
+        domains = [
+            ('example.com', None),
+            ('google.com', None),
+            ('python-syra.com', True),
+        ]
+        self.assertItemsEqual(
+            self.api.domain_check(*map(first, domains)),
+            domains)
+
     def test_domain_list(self):
         domains = self.api.domain_list()
         self.assertEqual(domains, [])
@@ -37,6 +48,7 @@ class SimpleTest(TestCase):
         co_uk = products.get('co.uk')
         self.assertEqual(com_au, {'MinimumPeriod': 2, 'Price': 10.0})
         self.assertEqual(co_uk, {'MinimumPeriod': 1, 'Price': 9.25})
+
 
 class LiveTest(TestCase):
 

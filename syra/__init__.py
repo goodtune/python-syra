@@ -145,7 +145,7 @@ class API(object):
     ### private methods
 
     def _availability_item(self, o):
-        return (o.Item, o.Available)
+        return (first(o.Item), first(o.Available))
 
     def _contact_details(self, response):
         c = {}
