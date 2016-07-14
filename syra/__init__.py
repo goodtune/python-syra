@@ -51,7 +51,7 @@ class API(object):
         request.ResellerID = reseller_id or self.reseller_id
         request.APIKey = api_key or self.api_key
         response = self.client.service.Authenticate(request)
-        return response.APIResponse.Success
+        return getattr(response.APIResponse, 'Success', False)
 
     def balance(self, as_decimal=True):
         response = self.client.service.GetBalance()
