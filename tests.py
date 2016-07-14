@@ -53,9 +53,7 @@ class SimpleTest(TestCase):
 class LiveTest(TestCase):
 
     def setUp(self):
-        reseller_id = os.environ.get('RESELLER_ID')
-        api_key = os.environ.get('API_KEY')
-        self.api = syra.API(reseller_id, api_key)
+        self.api = syra.API(timeout=3)
 
     def test_domain_list(self):
         domains = self.api.domain_list()
@@ -63,3 +61,18 @@ class LiveTest(TestCase):
             self.assertEqual(isinstance(domain, basestring), True)
             self.assertEqual(isinstance(status, basestring), True)
             self.assertEqual(isinstance(expiry, datetime.date), True)
+
+    def test_domain_info(self):
+        info = self.api.domain_info('touchtechnology.com.au')
+        self.assertDictEqual(
+            info['Eligibility'],
+            {
+                'BusinessType': "Company",
+                'BusinessNumber': "109064039",
+                'TradingNumberType': "ACN",
+                'BusinessNumberType': "ACN",
+                'TradingName': "Touch Technology Pty Ltd",
+                'TradingNumber': "109064039",
+                'PolicyReason': 1,
+                'BusinessName': "Touch Technology Pty Ltd",
+            })
