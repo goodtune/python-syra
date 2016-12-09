@@ -1,6 +1,6 @@
 language: python
-env: 
-  global: 
+env:
+  global:
   - secure: |-
       cTEIRPmfchu3EGqjXlIqBDxzo03NLU38WdWH6+D9ulFyWd4kys96jx7SJ9O3
       G9jaU2rkHAfzMSQbswBLcHh3LiduHx9FV8SIFa5X2kcUdoAh46WEzQH5qDLl
@@ -13,9 +13,9 @@ env:
   - NOSE_COVER_PACKAGE=syra
   - NOSE_COVER_BRANCHES=1
   - NOSE_NOLOGCAPTURE=1
-script: 
+script:
 - nosetests
-python: 
+python:
 - "2.7"
-install: 
+install:
 - pip install .
