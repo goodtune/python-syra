@@ -10,7 +10,13 @@ setup(
     author = 'Gary Reynolds',
     author_email = 'gary@touch.asn.au',
     description = 'Client for the Syra API.',
-    install_requires = filter(None, map(strip, open('requirements.txt'))),
+    install_requires = [
+        'click',
+        'first',
+        'python-dateutil',
+        'suds',
+        'ujson',
+    ],
     packages = ['syra'],
     classifiers = [
         'Development Status :: 4 - Beta',
@@ -22,5 +28,10 @@ setup(
         'Programming Language :: Python',
         'Topic :: Internet :: Name Service (DNS)',
         'Topic :: Software Development :: Libraries :: Python Modules',
-   ],
+    ],
+    entry_points = {
+        'console_scripts': [
+            'syra = syra.cli:main',
+        ],
+    },
 )

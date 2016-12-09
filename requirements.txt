@@ -1,3 +1,0 @@
-suds
-python-dateutil
-first
