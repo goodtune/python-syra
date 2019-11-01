@@ -43,24 +43,11 @@ class API(object):
             )
         )
 
-        # create a Transport
-        # transport = HttpTransport() if verify else UnverifiedHttpsTransport()
-
-        if not verify:
-            try:
-                _create_unverified_https_context = ssl._create_unverified_context
-            except AttributeError:
-                pass
-            else:
-                ssl._create_default_https_context = _create_unverified_https_context
+        if not verify and hasattr(ssl, "_create_unverified_https_context"):
+            ssl._create_default_https_context = ssl._create_unverified_https_context
 
         # interrogate the WSDL and treat it with our doctor
-        self.client = Client(
-            self.WSDL,
-            doctor=doctor,
-            timeout=timeout,
-            # transport=transport,
-        )
+        self.client = Client(self.WSDL, doctor=doctor, timeout=timeout)
 
         # attach our authentication XML
         self.client.set_options(soapheaders=token)

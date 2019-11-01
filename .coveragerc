@@ -1,4 +1,6 @@
 [report]
 fail_under = 45
 include=syra/*
+exclude_lines=
+	@click
 show_missing = true
