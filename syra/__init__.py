@@ -1,45 +1,66 @@
-from decimal import Decimal
-from operator import itemgetter
-
 import os
 import re
+import ssl
+from decimal import Decimal
+from operator import itemgetter
 
 from dateutil.parser import parse
 from first import first
 from suds.client import Client
 from suds.sax.element import Element
-from suds.xsd.doctor import ImportDoctor, Import
+from suds.xsd.doctor import Import, ImportDoctor
 
 
 class API(object):
+    ENDPOINT = "https://soap.secureapi.com.au/API-1.2"
+    WSDL = "https://soap.secureapi.com.au/wsdl/API-1.2.wsdl"
 
-    ENDPOINT = 'https://soap.secureapi.com.au/API-1.1'
-    WSDL = 'https://soap.secureapi.com.au/wsdl/API-1.1.wsdl'
-
-    def __init__(self, reseller_id=None, api_key=None, timeout=90, *args, **kwargs):
+    def __init__(
+        self, reseller_id=None, api_key=None, timeout=90, verify=True, *args, **kwargs
+    ):
         if reseller_id is None:
-            reseller_id = os.environ.get('SYRA_RESELLER_ID')
+            reseller_id = os.getenv("SYRA_RESELLER_ID")
         if api_key is None:
-            api_key = os.environ.get('SYRA_API_KEY')
+            api_key = os.getenv("SYRA_API_KEY")
+        if verify is None:
+            verify = True
 
         self.reseller_id = reseller_id
         self.api_key = api_key
 
-        imp = Import('http://schemas.xmlsoap.org/soap/encoding/')
+        imp = Import("http://schemas.xmlsoap.org/soap/encoding/")
         imp.filter.add(self.ENDPOINT)
         doctor = ImportDoctor(imp)
 
         # create an XML authenticate block which will be passed in the
         # SOAP headers - this API does not make use of Basic HTTP auth
-        token = Element('ns1:Authenticate').append(
-            Element('AuthenticateRequest').append([
-                Element('ResellerID').setText(reseller_id),
-                Element('APIKey').setText(api_key),
-            ])
+        token = Element("ns1:Authenticate").append(
+            Element("AuthenticateRequest").append(
+                [
+                    Element("ResellerID").setText(reseller_id),
+                    Element("APIKey").setText(api_key),
+                ]
+            )
         )
 
-        # interogate the WSDL and treat it with our doctor
-        self.client = Client(self.WSDL, doctor=doctor, timeout=timeout)
+        # create a Transport
+        # transport = HttpTransport() if verify else UnverifiedHttpsTransport()
+
+        if not verify:
+            try:
+                _create_unverified_https_context = ssl._create_unverified_context
+            except AttributeError:
+                pass
+            else:
+                ssl._create_default_https_context = _create_unverified_https_context
+
+        # interrogate the WSDL and treat it with our doctor
+        self.client = Client(
+            self.WSDL,
+            doctor=doctor,
+            timeout=timeout,
+            # transport=transport,
+        )
 
         # attach our authentication XML
         self.client.set_options(soapheaders=token)
@@ -47,34 +68,34 @@ class API(object):
     ### generic api operations
 
     def authenticate(self, reseller_id=None, api_key=None):
-        request = self.client.factory.create('AuthenticateRequest')
+        request = self.client.factory.create("AuthenticateRequest")
         request.ResellerID = reseller_id or self.reseller_id
         request.APIKey = api_key or self.api_key
         response = self.client.service.Authenticate(request)
-        return getattr(response.APIResponse, 'Success', False)
+        return getattr(response.APIResponse, "Success", False)
 
     def balance(self, as_decimal=True):
         response = self.client.service.GetBalance()
         result = response.APIResponse.Balance
         if as_decimal:
-            result = Decimal(re.search(r'\d+\.\d{2}', result).group())
+            result = Decimal(re.search(r"\d+\.\d{2}", result).group())
         return result
 
     def contact_list(self):
         request = self.client.service.GetContactIdentifierList()
-        if hasattr(request.APIResponse, 'ContactIdentifierList'):
+        if hasattr(request.APIResponse, "ContactIdentifierList"):
             for identifier in request.APIResponse.ContactIdentifierList:
                 yield self.contact_info(identifier)
 
     def domain_list(self):
         request = self.client.service.GetDomainList()
-        domain_list = getattr(request.APIResponse, 'DomainList', [])
-        return map(self._domain_list_item, domain_list)
+        domain_list = getattr(request.APIResponse, "DomainList", [])
+        return [self._domain_list_item(each) for each in domain_list]
 
     ### contact operations
 
     def contact_info(self, identifier):
-        request = self.client.factory.create('ContactInfoRequest')
+        request = self.client.factory.create("ContactInfoRequest")
         request.ContactIdentifier = identifier
         response = self.client.service.ContactInfo(request)
         return self._contact_details(response)
@@ -82,14 +103,16 @@ class API(object):
     ### domain operations
 
     def domain_check(self, *domains):
-        request = self.client.factory.create('DomainCheckRequest')
+        request = self.client.factory.create("DomainCheckRequest")
         request.DomainNames.string = domains
         response = self.client.service.DomainCheck(request)
-        return map(self._availability_item,
-                   response.APIResponse.AvailabilityList)
+        return [
+            self._availability_item(each)
+            for each in response.APIResponse.AvailabilityList
+        ]
 
     def _domain_info(self, domain):
-        request = self.client.factory.create('DomainInfoRequest')
+        request = self.client.factory.create("DomainInfoRequest")
         request.DomainName = domain
         return self.client.service.DomainInfo(request)
 
@@ -99,24 +122,30 @@ class API(object):
     def domain_create(self, domain, **kwargs):
         raise NotImplementedError
 
-    def domain_update(self, domain, admin_contact_id=None,
-                      billing_contact_id=None, technical_contact_id=None,
-                      name_servers=None):
+    def domain_update(
+        self,
+        domain,
+        admin_contact_id=None,
+        billing_contact_id=None,
+        technical_contact_id=None,
+        name_servers=None,
+    ):
         info = self._domain_info(domain).APIResponse.DomainDetails
-        request = self.client.factory.create('DomainUpdateRequest')
+        request = self.client.factory.create("DomainUpdateRequest")
         request.DomainName = domain
         # Assign any provided values, keep existing ones as retrieved from
         # DomainInfo request, and get readt to assign them.
-        request.AdminContactIdentifier = admin_contact_id or \
-            info.AdminContactIdentifier
-        request.BillingContactIdentifier = billing_contact_id or \
-            info.BillingContactIdentifier
-        request.TechContactIdentifier = technical_contact_id or \
-            info.TechContactIdentifier
+        request.AdminContactIdentifier = admin_contact_id or info.AdminContactIdentifier
+        request.BillingContactIdentifier = (
+            billing_contact_id or info.BillingContactIdentifier
+        )
+        request.TechContactIdentifier = (
+            technical_contact_id or info.TechContactIdentifier
+        )
         if name_servers:
             request.NameServers.item = []
             for host, ip in name_servers.items():
-                ns = self.client.factory.create('NameServer')
+                ns = self.client.factory.create("NameServer")
                 ns.Host = host
                 ns.IP = ip
                 request.NameServers.item.append(ns)
@@ -126,13 +155,13 @@ class API(object):
         return self._domain_details(response)
 
     def domain_delete(self, domain):
-        request = self.client.factory.create('DomainDeleteRequest')
+        request = self.client.factory.create("DomainDeleteRequest")
         request.DomainName = domain
         response = self.client.service.DomainDelete(request)
         return response.APIResponse.Success
 
     def domain_renew(self, domain, period):
-        request = self.client.factory.create('DomainRenewRequest')
+        request = self.client.factory.create("DomainRenewRequest")
         request.DomainName = domain
         request.RenewalPeriod = period
         response = self.client.service.DomainRenew(request)
@@ -180,15 +209,14 @@ class API(object):
         d = {}
         for item in response.APIResponse.DomainPriceList:
             data = dict((k, first(v)) for k, v in item)
-            product = data.pop('Product')
+            product = data.pop("Product")
             d[product] = data
         return d
 
 
 class TestAPI(API):
-
-    ENDPOINT = 'http://soap-test.secureapi.com.au/API-1.1'
-    WSDL = 'http://soap-test.secureapi.com.au/wsdl/API-1.1.wsdl'
+    ENDPOINT = "http://soap-test.secureapi.com.au/API-1.2"
+    WSDL = "http://soap-test.secureapi.com.au/wsdl/API-1.2.wsdl"
 
     def spawn_domains_for_transfer(self):
         # It seems as though this method is not working properly
