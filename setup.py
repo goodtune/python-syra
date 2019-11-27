@@ -1,14 +1,13 @@
 from setuptools import setup
 
-version = "0.4"
-
 setup(
     name="python-syra",
-    version=version,
     url="http://www.touchtechnology.com.au/",
     author="Gary Reynolds",
     author_email="gary@touch.asn.au",
     description="Client for the Syra API.",
+    setup_requires=["setuptools_scm"],
+    use_scm_version=True,
     install_requires=[
         "click",
         "first",
@@ -24,7 +23,9 @@ setup(
         "License :: Public Domain",
         "Natural Language :: English",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
         "Topic :: Internet :: Name Service (DNS)",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
