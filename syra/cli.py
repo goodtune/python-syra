@@ -136,8 +136,8 @@ def domain_renew(ctx, domain, period):
     res = ctx.obj["api"].domain_renew(domain, period)
     ok = res["Status"] == "Registered"
     click.secho(u"\u2713 " if ok else u"\u2717 ", nl=False, fg="green" if ok else "red")
-    click.secho(domain + " ")
-    click.secho(res["Expiry"].strftime("%d-%b-%Y"), fg="yellow", bold=True)
+    click.secho(res["Expiry"].strftime("%d-%b-%Y "), nl=False, fg="yellow" if ok else "magenta", bold=True)
+    click.secho(domain)
 
 
 def main():
